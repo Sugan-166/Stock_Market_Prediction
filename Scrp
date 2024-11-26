@@ -1,0 +1,33 @@
+import tweepy
+import pandas as pd
+import os
+from dotenv import load_dotenv
+
+# Load API keys from .env file
+load_dotenv()
+API_KEY = os.getenv("TWITTER_API_KEY")
+API_SECRET = os.getenv("TWITTER_API_SECRET")
+ACCESS_TOKEN = os.getenv("TWITTER_ACCESS_TOKEN")
+ACCESS_SECRET = os.getenv("TWITTER_ACCESS_SECRET")
+
+# Authenticate with Twitter API
+auth = tweepy.OAuthHandler(API_KEY, API_SECRET)
+auth.set_access_token(ACCESS_TOKEN, ACCESS_SECRET)
+api = tweepy.API(auth)
+
+def scrape_tweets(keyword, max_tweets=100):
+    tweets = []
+    for tweet in tweepy.Cursor(api.search_tweets, q=keyword, lang="en", tweet_mode="extended").items(max_tweets):
+        tweets.append({
+            "created_at": tweet.created_at,
+            "text": tweet.full_text,
+            "retweets": tweet.retweet_count,
+            "likes": tweet.favorite_count
+        })
+    return pd.DataFrame(tweets)
+
+if __name__ == "__main__":
+    keyword = "#StockMarket"
+    data = scrape_tweets(keyword, max_tweets=500)
+    data.to_csv("data/raw_data.csv", index=False)
+    print("Scraped tweets saved to data/raw_data.csv")
