@@ -1,0 +1,10 @@
+pandas
+numpy
+matplotlib
+sklearn
+streamlit
+shap
+tensorflow
+keras
+transformers
+pytrends
